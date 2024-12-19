@@ -1,0 +1,25 @@
+name: image_scope
+description: A Flutter package for advanced image previewing with animations, zoom, and unique features.
+version: 1.0.0
+homepage: https://github.com/Atanu-Sabyasachi/image_scope/tree/main
+repository: https://github.com/Atanu-Sabyasachi/image_scope/tree/main
+
+environment:
+  sdk: ^3.6.0
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cached_network_image:
+  photo_view:
+  flutter_staggered_animations:
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  assets:
+    - assets/images/
