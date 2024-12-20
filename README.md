@@ -18,6 +18,7 @@
 
 6. [Contributing](#contributing)
 7. [License](#license)
+8. [Credits](#credits)
 
 ---
 
@@ -27,7 +28,7 @@ Add the following to your `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  image_scope: ^1.0.1
+  image_scope: ^1.0.2
 ```
 
 ## Usage
@@ -181,8 +182,12 @@ Happy coding! 🚀
 
 This `README.md` covers installation, usage, features, property descriptions, and customization, making it beginner-friendly and informative for all users of the package.
 
+## Credits
+
+Special thanks to [Unsplash](https://unsplash.com) for providing high-quality and beautiful images that were used while testing and demonstrating this package. Their platform is a fantastic resource for free, high-resolution photos.
+
 -------------------------------------------------------------
 
-**Version**: 1.0.1  
+**Version**: 1.0.2  
 **Author**: Atanu Sabyasachi Jena  
 **License**: MIT
