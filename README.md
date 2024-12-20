@@ -27,7 +27,7 @@ Add the following to your `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  image_scope: ^1.0.0
+  image_scope: ^1.0.1
 ```
 
 ## Usage
@@ -186,7 +186,3 @@ This `README.md` covers installation, usage, features, property descriptions, an
 **Version**: 1.0.1  
 **Author**: Atanu Sabyasachi Jena  
 **License**: MIT
-
-
-
-
