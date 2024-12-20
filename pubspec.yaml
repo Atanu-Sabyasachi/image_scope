@@ -1,8 +1,11 @@
 name: image_scope
 description: A Flutter package for advanced image previewing with animations, zoom, and unique features.
 version: 1.0.0
-homepage: https://github.com/Atanu-Sabyasachi/image_scope/tree/main
-repository: https://github.com/Atanu-Sabyasachi/image_scope/tree/main
+license: MIT
+homepage: https://github.com/Atanu-Sabyasachi/image_scope/tree/master
+repository: https://github.com/Atanu-Sabyasachi/image_scope/tree/master
+funding:
+  - https://buymeacoffee.com/atanusabyasachi
 
 environment:
   sdk: ^3.6.0

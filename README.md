@@ -141,6 +141,7 @@ void showImagePreview(BuildContext context) {
 | `action`              | `Widget?`         | A custom widget (e.g., a close button) displayed in the top-right corner. | `null`|
 
 <h2 id="important-notes" style="color: #FF5733;">Important Notes</h2>
+
 1. **imageUrls should contain URLs of the same type**  
    The `imageUrls` list in the configuration must contain URLs of the same type, either all assets or all network URLs. You cannot mix both asset and network URLs in the same list.
 

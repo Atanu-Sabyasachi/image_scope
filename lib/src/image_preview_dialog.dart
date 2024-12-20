@@ -174,7 +174,6 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
                   tag: widget.imageUrls[index],
                   transitionOnUserGestures: true,
                 ),
-                semanticLabel: 'Image ${index + 1}',
               );
             },
             pageController: _pageController,
