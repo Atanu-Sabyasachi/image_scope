@@ -183,7 +183,7 @@ This `README.md` covers installation, usage, features, property descriptions, an
 
 -------------------------------------------------------------
 
-**Version**: 1.0.0  
+**Version**: 1.0.1  
 **Author**: Atanu Sabyasachi Jena  
 **License**: MIT
 
