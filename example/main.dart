@@ -24,6 +24,9 @@ class ImagePreviewDemo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // const imageUrls = [
+    //   'assets/images/hello.png',
+    // ];
     const imageUrls = [
       'https://images.unsplash.com/photo-1730979466254-91ca4a3123d8?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHw4fHx8ZW58MHx8fHx8',
       'https://images.unsplash.com/photo-1731429945593-61610daebc11?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxMnx8fGVufDB8fHx8fA%3D%3D',
@@ -70,19 +73,22 @@ class ImagePreviewDemo extends StatelessWidget {
                   imageType: ImageType.network,
                   configuration: configuration,
                   imageIndex: index,
-                  activeDotColor: Colors.green,
-                  inactiveDotColor: const Color.fromARGB(255, 169, 248, 210),
-                  activeDotHeight: 15,
-                  activeDotWidth: 15,
-                  nextButtonColor: Colors.blue,
-                  previousButtonColor: Colors.blue,
-                  enableZoom: true, // Enable zoom functionality
+                  activeDotColor: Colors.white,
+                  inactiveDotColor: Colors.grey,
+                  activeDotHeight: 5,
+                  activeDotWidth: 5,
+                  inactiveDotHeight: 2,
+                  inactiveDotWidth: 2,
+                  nextButtonColor: Colors.white,
+                  previousButtonColor: Colors.white,
+                  nextButtonSize: 40,
+                  previousButtonSize: 40,
                   showPaginationDots: true, // Show pagination dots
                   showNavigationButtons: true, // Show navigation buttons
                   action: Row(
                     children: [
                       IconButton(
-                        onPressed: () {},
+                        onPressed: () async {},
                         icon: Icon(
                           Icons.share,
                           color: Colors.white,
@@ -90,9 +96,9 @@ class ImagePreviewDemo extends StatelessWidget {
                       ),
                       const SizedBox(width: 10),
                       IconButton(
-                        onPressed: () {},
+                        onPressed: () async {},
                         icon: Icon(
-                          Icons.download,
+                          Icons.download_rounded,
                           color: Colors.white,
                         ),
                       ),
@@ -108,28 +114,37 @@ class ImagePreviewDemo extends StatelessWidget {
                       ),
                     ],
                   ),
-                  enableSwipe:
-                      false, // Enable swipe gesture for image navigation
-                  transitionBuilder:
-                      (context, animation, secondaryAnimation, child) {
-                    // Custom transition with fade, scale, and rotation effects
+
+                  transitionBuilder: (
+                    context,
+                    animation,
+                    secondaryAnimation,
+                    child,
+                  ) {
+                    // Define a curved animation for smoothness
                     var curvedAnimation = CurvedAnimation(
                       parent: animation,
                       curve: Curves.easeInOut,
                     );
 
-                    // Define the scale effect
-                    var scaleAnimation = Tween<double>(begin: 0.8, end: 1.0)
-                        .animate(curvedAnimation);
+                    // Define the slide-in effect from the right
+                    var slideAnimation = Tween<Offset>(
+                      begin: const Offset(
+                          1.0, 0.0), // Start off-screen to the right
+                      end: Offset.zero,
+                    ).animate(curvedAnimation);
 
-                    // Define the rotation effect
-                    var rotationAnimation = Tween<double>(begin: -0.1, end: 0.0)
-                        .animate(curvedAnimation);
+                    // Define the scale (zoom-in) effect
+                    var scaleAnimation = Tween<double>(
+                      begin: 0.5, // Start at half size
+                      end: 1.0, // Zoom to full size
+                    ).animate(curvedAnimation);
 
-                    return ScaleTransition(
-                      scale: scaleAnimation,
-                      child: RotationTransition(
-                        turns: rotationAnimation,
+                    // Combine slide, zoom, and fade effects
+                    return SlideTransition(
+                      position: slideAnimation,
+                      child: ScaleTransition(
+                        scale: scaleAnimation,
                         child: FadeTransition(
                           opacity: curvedAnimation,
                           child: child,
@@ -137,9 +152,10 @@ class ImagePreviewDemo extends StatelessWidget {
                       ),
                     );
                   },
+
                   transitionDuration:
-                      Duration(milliseconds: 900), // Set transition duration
-                  transitionCurve: Curves.easeInOut, // Set transition curve
+                      Duration(milliseconds: 400), // Set transition duration
+                  transitionCurve: Curves.easeOutQuart, // Set transition curve
                 );
               },
               child: Image.network(

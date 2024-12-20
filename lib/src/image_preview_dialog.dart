@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:image_scope/enum.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
+
+import 'package:image_scope/enum.dart';
 
 /// A dialog that displays a gallery of images with various customization options.
 ///
@@ -15,9 +16,6 @@ class ImagePreviewDialog extends StatefulWidget {
   /// - [imageUrls]: A list of URLs for the images to display in the gallery.
   final List<String> imageUrls;
 
-  /// - [enableZoom]: A flag that determines whether zooming functionality is enabled.
-  final bool enableZoom;
-
   /// - [showDescription]: A flag that determines whether image descriptions should be shown.
   final bool showDescription;
 
@@ -30,8 +28,14 @@ class ImagePreviewDialog extends StatefulWidget {
   /// - [showPaginationDots]: A flag that determines whether pagination dots are shown at the bottom.
   final bool showPaginationDots;
 
-  /// - [enableSwipeGesture]: A flag to enable swipe gestures to navigate between images.
-  final bool enableSwipeGesture;
+  /// - [enableZoomOut]: Setting it's value to true will enable user to zoom out the image.
+  final bool? enableZoomOut;
+
+  /// - [enableZoomIn]: Setting it's value to true will enable user to zoom into the image.
+  final bool? enableZoomIn;
+
+  /// - [imagePosition]: This will determine the position of the image on the screen.
+  final Alignment? imagePosition;
 
   /// - [nextButtonColor]: The color of the "Next" navigation button.
   final Color? nextButtonColor;
@@ -57,8 +61,11 @@ class ImagePreviewDialog extends StatefulWidget {
   /// - [inactiveDotWidth]: The width of the inactive pagination dot.
   final double? inactiveDotWidth;
 
-  /// - [customBackground]: The custom background decoration for the gallery view.
-  final BoxDecoration customBackground;
+  /// - [inactiveDotWidth]: The width of the inactive pagination dot.
+  final double? previousButtonSize;
+
+  /// - [inactiveDotWidth]: The width of the inactive pagination dot.
+  final double? nextButtonSize;
 
   /// - [initialIndex]: The initial index of the image to be displayed.
   final int initialIndex;
@@ -69,15 +76,46 @@ class ImagePreviewDialog extends StatefulWidget {
   /// - [action]: An optional widget that can be displayed as an action button in the top right corner.
   final Widget? action;
 
+  /// A dialog that displays a gallery of images with various customization options.
+  ///
+  /// The dialog allows users to swipe through images, zoom in, see descriptions,
+  /// and use navigation buttons. The images can be navigated using swipe gestures
+  /// or explicit navigation buttons.
+  ///
+  ///
+  /// Args:
+  /// - [imageUrls]: A list of URLs for the images to display in the gallery.
+  /// - [showDescription]: A flag that determines whether image descriptions should be shown.
+  /// - [descriptions]: An optional list of descriptions corresponding to the images.
+  /// - [showNavigationButtons]: A flag that determines whether navigation buttons are displayed.
+  /// - [showPaginationDots]: A flag that determines whether pagination dots are shown at the bottom.
+  /// - [enableZoomOut]: Setting its value to true will enable users to zoom out the image.
+  /// - [enableZoomIn]: Setting its value to true will enable users to zoom into the image.
+  /// - [imagePosition]: This will determine the position of the image on the screen.
+  /// - [nextButtonColor]: The color of the "Next" navigation button.
+  /// - [previousButtonColor]: The color of the "Previous" navigation button.
+  /// - [activeDotColor]: The color of the active pagination dot.
+  /// - [inactiveDotColor]: The color of the inactive pagination dots.
+  /// - [activeDotHeight]: The height of the active pagination dot.
+  /// - [activeDotWidth]: The width of the active pagination dot.
+  /// - [inactiveDotHeight]: The height of the inactive pagination dot.
+  /// - [inactiveDotWidth]: The width of the inactive pagination dot.
+  /// - [previousButtonSize]: The size of the "Previous" navigation button.
+  /// - [nextButtonSize]: The size of the "Next" navigation button.
+  /// - [initialIndex]: The initial index of the image to be displayed.
+  /// - [imageType]: Type of image (either `ImageType.asset` or `ImageType.network`).
+  /// - [action]: An optional widget that can be displayed as an action button in the top right corner.
+
   const ImagePreviewDialog({
     super.key,
     required this.imageUrls,
-    required this.enableZoom,
     required this.showDescription,
-    this.descriptions,
+    required this.initialIndex,
+    required this.imageType,
     required this.showNavigationButtons,
     required this.showPaginationDots,
-    this.enableSwipeGesture = true,
+    this.descriptions,
+    this.enableZoomOut,
     this.nextButtonColor,
     this.previousButtonColor,
     this.activeDotColor,
@@ -86,10 +124,11 @@ class ImagePreviewDialog extends StatefulWidget {
     this.activeDotWidth,
     this.inactiveDotHeight,
     this.inactiveDotWidth,
-    required this.customBackground,
-    required this.initialIndex,
+    this.previousButtonSize,
+    this.nextButtonSize,
     this.action,
-    required this.imageType,
+    this.imagePosition,
+    this.enableZoomIn,
   });
 
   @override
@@ -115,59 +154,46 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
       backgroundColor: Colors.transparent,
       body: Stack(
         children: [
-          // Background container with the custom background decoration
-          Container(
-            decoration: widget.customBackground,
+          PhotoViewGallery.builder(
+            itemCount: widget.imageUrls.length,
+            builder: (context, index) {
+              return PhotoViewGalleryPageOptions(
+                imageProvider: widget.imageType == ImageType.network
+                    ? NetworkImage(widget.imageUrls[index])
+                    : AssetImage(widget.imageUrls[index]),
+                basePosition: widget.imagePosition ?? Alignment.center,
+                minScale: (widget.enableZoomOut == true)
+                    ? PhotoViewComputedScale.contained * .1
+                    : PhotoViewComputedScale.contained * 1,
+                maxScale: (widget.enableZoomIn == true)
+                    ? PhotoViewComputedScale.contained * 2.5
+                    : PhotoViewComputedScale.contained,
+                errorBuilder: (context, error, stackTrace) =>
+                    Center(child: Text('Failed to load image: $error')),
+                heroAttributes: PhotoViewHeroAttributes(
+                  tag: widget.imageUrls[index],
+                  transitionOnUserGestures: true,
+                ),
+                semanticLabel: 'Image ${index + 1}',
+              );
+            },
+            pageController: _pageController,
+            onPageChanged: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
           ),
-          GestureDetector(
-            // Gesture detection for swipe navigation between images
-            onPanUpdate: widget.enableSwipeGesture
-                ? (details) {
-                    if (details.primaryDelta! < -10 &&
-                        _currentIndex < widget.imageUrls.length - 1) {
-                      setState(() {
-                        _currentIndex++;
-                      });
-                    } else if (details.primaryDelta! > 10 &&
-                        _currentIndex > 0) {
-                      setState(() {
-                        _currentIndex--;
-                      });
-                    }
-                  }
-                : null,
-            child: PhotoViewGallery.builder(
-              itemCount: widget.imageUrls.length,
-              builder: (context, index) {
-                // Build each photo view page
-                return PhotoViewGalleryPageOptions(
-                  imageProvider: widget.imageType == ImageType.network
-                      ? NetworkImage(widget.imageUrls[index])
-                      : AssetImage('assets/images/hello.png'),
-                  minScale: PhotoViewComputedScale.contained,
-                  maxScale: widget.enableZoom
-                      ? PhotoViewComputedScale.covered * 2.0
-                      : PhotoViewComputedScale.contained,
-                );
-              },
-              pageController:
-                  _pageController, // Page controller with initial index
-              onPageChanged: (index) {
-                setState(() {
-                  _currentIndex = index;
-                });
-              },
-            ),
-          ),
-          // Navigation buttons for "Previous" and "Next"
-          if (widget.showNavigationButtons)
+
+          if (widget.showNavigationButtons && _currentIndex > 0)
             Positioned(
               left: 10,
-              top: MediaQuery.of(context).size.height / 2 - 30,
+              top: MediaQuery.of(context).size.height / 2 - 25,
               child: IconButton(
                 icon: Icon(
-                  Icons.arrow_back_ios,
+                  Icons.arrow_back_ios_new_rounded,
                   color: widget.previousButtonColor ?? Colors.white,
+                  size: widget.previousButtonSize ?? 15,
                 ),
                 onPressed: _currentIndex > 0
                     ? () {
@@ -182,14 +208,16 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
                     : null,
               ),
             ),
-          if (widget.showNavigationButtons)
+          if (widget.showNavigationButtons &&
+              _currentIndex < widget.imageUrls.length - 1)
             Positioned(
               right: 10,
-              top: MediaQuery.of(context).size.height / 2 - 30,
+              top: MediaQuery.of(context).size.height / 2 - 25,
               child: IconButton(
                 icon: Icon(
-                  Icons.arrow_forward_ios,
+                  Icons.arrow_forward_ios_rounded,
                   color: widget.nextButtonColor ?? Colors.white,
+                  size: widget.nextButtonSize ?? 15,
                 ),
                 onPressed: _currentIndex < widget.imageUrls.length - 1
                     ? () {

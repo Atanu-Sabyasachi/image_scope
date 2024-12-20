@@ -3,10 +3,6 @@ import 'package:image_scope/config/image_config.dart';
 import 'package:image_scope/enum.dart';
 import 'package:image_scope/src/image_preview_dialog.dart';
 
-/// ImageScope is a customizable Flutter package designed to provide an intuitive and visually appealing
-/// interface for previewing images in a full-screen modal. It supports advanced features like zoom, swipe navigation,
-/// descriptions, pagination dots, navigation buttons, and more. This package is ideal for applications
-/// requiring image galleries or detailed image exploration.
 class ImageScope {
   /// Shows a modal image preview with the provided configuration.
   ///
@@ -14,56 +10,83 @@ class ImageScope {
   /// You can customize various aspects of the preview through the provided
   /// configuration options.
   ///
+  /// Example usage:
+  /// ```dart
+  /// final configuration = ImageScopeConfiguration(
+  ///   imageUrls: imageUrls,
+  ///   showDescription: true,
+  ///   descriptions: descriptions,
+  /// );
+  ///
+  /// ImageScope.show(
+  ///   context: context,
+  ///   configuration: configuration,
+  ///   imageIndex: index,
+  ///   imageType: ImageType.network,
+  /// );
+  ///
+  /// ```
+  /// [imageIndex] is required if you want to show the image that is clicked if there are more than one images especially in case of List or Grid view. (defaults to 0 i.e, 1st image will be shown by default)
+  ///
+  /// [ImageType] needs to be provided to handle both asset and network images.
+  ///
+  /// N.B. - All the image urls must be of the same type (network/asset).
+  ///
+  /// Args:
   ///   - [context]: The BuildContext of the widget that triggers the preview.
   ///
   ///   - [configuration]: An instance of [ImageScopeConfiguration] that defines the images and settings for the preview.
   ///
-  ///   - [imageIndex (optional)]: The initial index of the image to be displayed. Defaults to 0.
+  ///   - [imageIndex]: The initial index of the image to be displayed. Defaults to 0.
   ///
-  ///   - [enableZoom (optional)]: Whether to enable zooming on the images. Defaults to false.
+  ///   - [transitionDuration]: The duration of the animation used when transitioning between images. Defaults to 3 seconds.
   ///
-  ///   - [transitionDuration (optional)]: The duration of the animation used when transitioning between images. Defaults to 3 seconds.
+  ///   - [transitionCurve]: The curve used for the animation. Defaults to Curves.easeInOut.
   ///
-  ///   - [transitionCurve (optional)]: The curve used for the animation. Defaults to Curves.easeInOut.
+  ///   - [showNavigationButtons]: Whether to show navigation buttons for switching between images. Defaults to false.
   ///
-  ///   - [showNavigationButtons (optional)]: Whether to show navigation buttons for switching between images. Defaults to false.
+  ///   - [showPaginationDots]: Whether to show pagination dots indicating the number of images. Defaults to false.
   ///
-  ///   - [showPaginationDots (optional)]: Whether to show pagination dots indicating the number of images. Defaults to false.
+  ///   - [enableZoomIn]: Whether to enable zooming into the images.
   ///
-  ///   - [enableSwipe (optional)]: Whether to enable swiping to navigate between images. Defaults to true.
+  ///   - [enableZoomOut]: Whether to enable zooming out the images.
   ///
-  ///   - [nextButtonColor (optional)]: The color of the next button.
+  ///   - [imagePosition]: Determines the position of the image on the screen.
   ///
-  ///   - [previousButtonColor (optional)]: The color of the previous button.
+  ///   - [nextButtonColor]: The color of the next button.
   ///
-  ///   - [activeDotColor (optional)]: The color of the active pagination dot.
+  ///   - [previousButtonColor]: The color of the previous button.
   ///
-  ///   - [inactiveDotColor (optional)]: The color of the inactive pagination dots.
+  ///   - [previousButtonSize]: The size of the previous button.
   ///
-  ///   - [activeDotHeight (optional)]: The height of the active pagination dot.
+  ///   - [nextButtonSize]: The size of the next button.
   ///
-  ///   - [activeDotWidth (optional)]: The width of the active pagination dot.
+  ///   - [activeDotColor]: The color of the active pagination dot.
   ///
-  ///   - [inactiveDotHeight (optional)]: The height of the inactive pagination dots.
+  ///   - [inactiveDotColor]: The color of the inactive pagination dots.
   ///
-  ///   - [inactiveDotWidth (optional)]: The width of the inactive pagination dots.
+  ///   - [activeDotHeight]: The height of the active pagination dot.
   ///
-  ///   - [action (optional)]: A widget to display below the image preview.
+  ///   - [activeDotWidth]: The width of the active pagination dot.
+  ///
+  ///   - [inactiveDotHeight]: The height of the inactive pagination dots.
+  ///
+  ///   - [inactiveDotWidth]: The width of the inactive pagination dots.
+  ///
+  ///   - [action]: A widget to display below the image preview.
   ///
   ///   - [imageType]: Type of image (asset or network)
   ///
-  ///   - [transitionBuilder (optional)]: A custom builder function for the transition animation between images.
+  ///   - [transitionBuilder]: A custom builder function for the transition animation between images.
   static void show({
     required BuildContext context,
     required ImageScopeConfiguration configuration,
     required ImageType imageType,
     int imageIndex = 0,
-    bool enableZoom = false,
     Duration transitionDuration = const Duration(seconds: 3),
     Curve transitionCurve = Curves.easeInOut,
     bool showNavigationButtons = false,
     bool showPaginationDots = false,
-    bool enableSwipe = true,
     Color? nextButtonColor,
     Color? previousButtonColor,
     Color? activeDotColor,
@@ -72,7 +95,12 @@ class ImageScope {
     double? activeDotWidth,
     double? inactiveDotHeight,
     double? inactiveDotWidth,
+    double? previousButtonSize,
+    double? nextButtonSize,
     Widget? action,
+    bool? enableZoomOut,
+    bool? enableZoomIn,
+    Alignment? imagePosition,
     Widget Function(
       BuildContext context,
       Animation<double> animation1,
@@ -87,12 +115,10 @@ class ImageScope {
           imageUrls: configuration.imageUrls,
           initialIndex: imageIndex,
           imageType: imageType,
-          enableZoom: enableZoom,
           showDescription: configuration.showDescription ?? false,
           descriptions: configuration.descriptions,
           showNavigationButtons: showNavigationButtons,
           showPaginationDots: showPaginationDots,
-          enableSwipeGesture: enableSwipe,
           activeDotColor: activeDotColor,
           inactiveDotColor: inactiveDotColor,
           activeDotHeight: activeDotHeight,
@@ -101,28 +127,26 @@ class ImageScope {
           inactiveDotWidth: inactiveDotWidth,
           nextButtonColor: nextButtonColor,
           previousButtonColor: previousButtonColor,
+          nextButtonSize: nextButtonSize,
+          previousButtonSize: previousButtonSize,
+          enableZoomIn: enableZoomIn,
+          enableZoomOut: enableZoomOut,
+          imagePosition: imagePosition,
           action: action,
-          customBackground: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color.fromRGBO(0, 0, 0, 0.6),
-                Colors.transparent,
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-          ),
         );
       },
       transitionBuilder: transitionBuilder ??
           (context, animation, secondaryAnimation, child) {
-            // Custom transition with slide-in effect
             return SlideTransition(
               position: Tween<Offset>(
                 begin: Offset(0, 1), // Start below the screen
                 end: Offset.zero,
               ).animate(
-                  CurvedAnimation(parent: animation, curve: transitionCurve)),
+                CurvedAnimation(
+                  parent: animation,
+                  curve: transitionCurve,
+                ),
+              ),
               child: FadeTransition(
                 opacity: animation,
                 child: ScaleTransition(
